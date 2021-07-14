@@ -8,6 +8,8 @@ public class ChapterInfo {
 	private String filepath;
 	private String content;
 	private Integer words;
+	private Integer weight;
+	private Integer isexit;
 
 	@Override
 	public String toString() {
@@ -18,7 +20,25 @@ public class ChapterInfo {
 				", filepath='" + filepath + '\'' +
 				", content='" + content + '\'' +
 				", words=" + words +
+				", weight=" + weight +
+				", isexit=" + isexit +
 				'}';
+	}
+
+	public Integer getIsexit() {
+		return isexit;
+	}
+
+	public void setIsexit(Integer isexit) {
+		this.isexit = isexit;
+	}
+
+	public Integer getWeight() {
+		return weight;
+	}
+
+	public void setWeight(Integer weight) {
+		this.weight = weight;
 	}
 
 	public Integer getId() {

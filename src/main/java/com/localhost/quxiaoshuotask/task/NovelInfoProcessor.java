@@ -37,64 +37,80 @@ public class NovelInfoProcessor implements PageProcessor, CommandLineRunner {
 		if (exit.size() != 0) {//不等于0,是小说详情页面
 			try {
 				Html pageHtml = page.getHtml();
-				//标题
-				String title = pageHtml.css("meta[property=og:novel:book_name]").css("meta", "content").toString();
-				//小说id
-				String id = page.getUrl().toString().split("_")[1];
-				//image
-				String image = pageHtml.css("meta[property=og:image]").css("meta", "content").toString();
-				//作者
-				String author = pageHtml.css("meta[property=og:novel:author]").css("meta", "content").toString();
-				//小说类型
-				String category = pageHtml.css("meta[property=og:novel:category]").css("meta", "content").toString();
-				//URL
-				String url = pageHtml.css("meta[property=og:url]").css("meta", "content").toString();
-				//更新时间
-				// DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pageHtml.css("meta[property=og:url]").css("meta", "content").toString());
-				Date updateDate = null;
-				try {
-					updateDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(pageHtml.css("meta[property=og:novel:update_time]").css("meta", "content").toString());
-				} catch (ParseException e) {
-					page.setSkip(true);
-					e.printStackTrace();
-				}
-				//状态
-				String statusStr = pageHtml.css("meta[property=og:novel:status]").css("meta", "content").toString();
-				int status = 1;
-				if ("连载".equals(statusStr)) {
-					status = 0;
-				}
-				//简介
-				String description = pageHtml.css("meta[property=og:description]").css("meta", "content").toString();
-				//一共多少章
-				List<String> chapters = pageHtml.css("div#list dl dd").all();
-				int size = chapters.size();
-				if (chapters==null){
-					size=0;
-					page.setSkip(true);
-				}
-				int ibg;
-				if (size <= 18) {
-					size /= 2;
-					ibg = size;
-				} else {
-					size -= 9;
-					ibg = 9;
-				}
-
+				// //标题
+				// String title = pageHtml.css("meta[property=og:novel:book_name]").css("meta", "content").toString();
+				// //小说id
+				// String id = page.getUrl().toString().split("_")[1];
+				// //image
+				// String image = pageHtml.css("meta[property=og:image]").css("meta", "content").toString();
+				// //作者
+				// String author = pageHtml.css("meta[property=og:novel:author]").css("meta", "content").toString();
+				// //小说类型
+				// String category = pageHtml.css("meta[property=og:novel:category]").css("meta", "content").toString();
+				// //URL
+				// String url = pageHtml.css("meta[property=og:url]").css("meta", "content").toString();
+				// //更新时间
+				// // DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pageHtml.css("meta[property=og:url]").css("meta", "content").toString());
+				// Date updateDate = null;
+				// try {
+				// 	updateDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(pageHtml.css("meta[property=og:novel:update_time]").css("meta", "content").toString());
+				// } catch (ParseException e) {
+				// 	page.setSkip(true);
+				// 	e.printStackTrace();
+				// }
+				// //状态
+				// String statusStr = pageHtml.css("meta[property=og:novel:status]").css("meta", "content").toString();
+				// int status = 1;
+				// if ("连载".equals(statusStr)) {
+				// 	status = 0;
+				// }
+				// //简介
+				// String description = pageHtml.css("meta[property=og:description]").css("meta", "content").toString();
+				// //一共多少章
+				List<Selectable> chapters = pageHtml.css("div#list dl dd").nodes();
+				// System.out.println(nodes.size());
+				// System.out.println(nodes);
+				// List<String> chapters = pageHtml.css("div#list dl dd").all();
+				// // System.out.println(chapters);
+				// int size = chapters.size();
+				// // System.out.println(size);
+				// if (chapters == null) {
+				// 	size = 0;
+				// 	page.setSkip(true);
+				// }
+				// int ibg;
+				// if (size <= 18) {
+				// 	size /= 2;
+				// 	ibg = size;
+				// } else {
+				// 	size -= 9;
+				// 	ibg = 9;
+				// }
+				String novelKey = page.getUrl().toString().split("_")[1].split("/")[0];
+				page.putField("novelKey", novelKey);
+				page.putField("chapters",chapters);
+				// Selectable selectable;
+				// for (int i = ibg; i < nodes.size(); i++) {
+				// 	String chapterLink = nodes.get(i).links().toString();
+				// 	String chapterTitle = Jsoup.parse(nodes.get(i).toString()).select("a").text();
+				//
+				// 	page.putField("chapterLink", chapterLink);
+				// 	page.putField("chapterTitle", chapterTitle);
+				// }
+				// System.out.println(size);
 				//获取数据,封装到对象中
 				//System.out.println(title + " : " + image + " : " + id + " : " + size + " : " + status + " : " + updateDate + " : " + url + " : " + author);
-				NovelInfo novelInfo = new NovelInfo();
-				novelInfo.setTitle(title);
-				novelInfo.setNovelkey(Long.valueOf(id));
-				novelInfo.setAuthor(author);
-				novelInfo.setChapters(Long.valueOf(size));
-				novelInfo.setUrl(url);
-				novelInfo.setDescription(description);
-				novelInfo.setUpdate(updateDate);
-				novelInfo.setStatus(status);
-				novelInfo.setImage(image);
-				novelInfo.setCategory(category);
+				// NovelInfo novelInfo = new NovelInfo();
+				// novelInfo.setTitle(title);
+				// novelInfo.setNovelkey(Long.valueOf(id));
+				// novelInfo.setAuthor(author);
+				// novelInfo.setChapters(Long.valueOf(size));
+				// novelInfo.setUrl(url);
+				// novelInfo.setDescription(description);
+				// novelInfo.setUpdate(updateDate);
+				// novelInfo.setStatus(status);
+				// novelInfo.setImage(image);
+				// novelInfo.setCategory(category);
 				// System.out.println(novelInfo);
 
 				//获取详情页面的章节超链接
@@ -105,11 +121,11 @@ public class NovelInfoProcessor implements PageProcessor, CommandLineRunner {
 				// }
 
 				//下一部小说路径
-				String nextUrl = "http://www.biquge.tv/0_" + (Long.valueOf(id) + 1);
-				page.addTargetRequest(nextUrl);
+				// String nextUrl = "http://www.biquge.tv/0_" + (Long.valueOf(id) + 1);
+				// page.addTargetRequest(nextUrl);
 
 				//把小说详情页面结果保存起来
-				page.putField("novelInfo", novelInfo);
+				//page.putField("novelInfo", novelInfo);
 			} catch (Exception e) {
 				page.setSkip(true);
 				e.printStackTrace();
@@ -121,9 +137,9 @@ public class NovelInfoProcessor implements PageProcessor, CommandLineRunner {
 	}
 
 	//解析章节页面,保存
-	private void saveChapterInfo(Page page){
+	private void saveChapterInfo(Page page) {
 		Html pageHtml = page.getHtml();
-		Document parse =  pageHtml.getDocument();
+		Document parse = pageHtml.getDocument();
 		//小说章节的url
 		String chapterUrl = page.getUrl().toString();
 		//属于小说的id
@@ -152,7 +168,7 @@ public class NovelInfoProcessor implements PageProcessor, CommandLineRunner {
 			.setRetryTimes(2)//重试次数
 			.addHeader("Referer", "http://www.biquge.tv/")//设置跳转前页面
 			.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.106 Safari/537.36")
-			.setTimeOut(30*1000)//超时时间3s
+			.setTimeOut(30 * 1000)//超时时间3s
 			.setRetryTimes(2000)//重试间隔
 			.setSleepTime(300);//两次间隔
 
@@ -168,6 +184,14 @@ public class NovelInfoProcessor implements PageProcessor, CommandLineRunner {
 			//设置起始url
 			.thread(14);
 	//.addUrl("http://www.biquge.tv/0_63352/","http://www.biquge.tv/0_63351/");
+
+	public static void main(String[] args) {
+		System.out.println("开始执行一次");
+		String url = "http://www.biquge.tv/5_1/";//初始
+		spider.addUrl(url);
+		spider.addPipeline(new NovelInfoPipeline());
+		spider.start();
+	}
 
 	@Override
 	public void run(String... args) throws Exception {
